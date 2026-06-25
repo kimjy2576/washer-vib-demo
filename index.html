@@ -273,7 +273,7 @@ function buildMounts(){
   const gThk=5+(gk-1)/9*7;
   const gkMat=new THREE.MeshStandardMaterial({color:new THREE.Color().setHSL(0.0,0.55,0.62-gc/0.1*0.18),roughness:0.55});
   const gkM=new THREE.Mesh(new THREE.TorusGeometry(P.drumR+5,gThk,12,44),gkMat);
-  gkM.position.z=tubL/2-8;mountGroup.add(gkM);
+  gkM.position.z=tubL/2-8;tubGroup.add(gkM);
   // TDS 좌우 보조댐퍼 (type!=none), force -> 굵기
   [['R',1],['L',-1]].forEach(a=>{
     const id=a[0],sgn=a[1],type=P['Tds_'+id+'_t'];
