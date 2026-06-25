@@ -116,6 +116,13 @@ select{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:7px
       <div class="acc-h"><span class="dot s"></span>TDS 보조댐퍼<span class="cnt">L/R</span><span class="chev">▶</span></div>
       <div class="acc-body" id="tdsBody"></div>
     </div>
+    <div class="acc" data-acc>
+      <div class="acc-h"><span class="dot g"></span>무게중심 · 관성<span class="cnt">3체</span><span class="chev">▶</span></div>
+      <div class="acc-body">
+        <div style="display:flex;gap:6px;margin-bottom:10px"><button class="btn" id="tgCM" style="flex:1;padding:7px">CM 마커</button><button class="btn" id="tgIn" style="flex:1;padding:7px">관성 타원체</button></div>
+        <div id="inertiaPanel"></div>
+      </div>
+    </div>
 
     <div class="pfoot">
       <button class="btn" id="btnVib">▶ 진동</button>
@@ -158,6 +165,7 @@ const root=new THREE.Group();scene.add(root);
 const tubGroup=new THREE.Group();root.add(tubGroup);
 const suspGroup=new THREE.Group();root.add(suspGroup);
 const mountGroup=new THREE.Group();root.add(mountGroup);
+const inertiaGroup=new THREE.Group();root.add(inertiaGroup);
 const CAB={w:700,h:850,d:700};
 
 // 댐퍼 4점 정의 + 패널 동적 생성
@@ -178,6 +186,14 @@ const TDSL=[{id:'R',label:'우측 (Right)'},{id:'L',label:'좌측 (Left)'}];
 document.getElementById('bushBody').innerHTML=BUSH.map(b=>sl(b[0],b[1],b[2],b[3],b[4],b[5],b[6],b[7])).join('');
 document.getElementById('gaskBody').innerHTML=GASK.map(b=>sl(b[0],b[1],b[2],b[3],b[4],b[5],b[6],b[7])).join('');
 document.getElementById('tdsBody').innerHTML=TDSL.map(t=>'<div class="sub">'+t.label+'</div>'+'<div class="ctrl"><div class="ctrl-h"><label>타입</label></div><select id="Tds_'+t.id+'_t"><option value="none">없음</option><option value="fric">마찰</option><option value="2stg">2단</option></select></div>'+sl('Tds_'+t.id+'_f','댐핑력','N',0,100,0,1,0)+sl('Tds_'+t.id+'_l','설치 길이','mm',150,250,200,1,0)+sl('Tds_'+t.id+'_a','설치 각도','°',45,90,70,0.5,1)).join('');
+const BODIES=[{id:'Drum',label:'드럼',color:0x2563eb,cm:[1.15,457.4,495.2],I:[969820,868643,970772,1427,19937,13862]},{id:'Tub',label:'터브',color:0x94a3b8,cm:[-2.86,296.19,484.28],I:[3900278,2692529,4209583,6233,-25205,-24778]},{id:'Sys',label:'시스템',color:0xd97706,cm:[-1.73,341.53,487.36],I:[5132098,3562529,5441317,1179,-22961,-11356]}];
+const INM=['xx','yy','zz','xy','yz','zx'];
+document.getElementById('inertiaPanel').innerHTML=BODIES.map(b=>{
+  let h='<div class="sub">'+b.label+'</div>';
+  ['X','Y','Z'].forEach((ax,i)=>{h+=sl(b.id+'_CM_'+ax,'CM '+ax,'mm',b.cm[i]-60,b.cm[i]+60,b.cm[i],0.5,1);});
+  INM.forEach((nm,i)=>{const v=b.I[i],mn=i<3?v*0.5:Math.min(v,0)-Math.abs(v||1e5)*1.5,mx=i<3?v*1.5:Math.max(v,0)+Math.abs(v||1e5)*1.5;h+=sl(b.id+'_I'+nm,'I'+nm,'kg·mm²',Math.round(mn),Math.round(mx),v,Math.max(1,Math.round(Math.abs(v||1000)/100)),0);});
+  return h;
+}).join('');
 
 function clearGroup(g){while(g.children.length){const c=g.children.pop();if(c.geometry)c.geometry.dispose();g.remove(c);}}
 function buildCabinet(){root.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(CAB.w,CAB.h,CAB.d)),matCab));}
@@ -208,6 +224,7 @@ function readParams(){
   DAMPERS.forEach(d=>{P['D_'+d.id+'_l']=+val('D_'+d.id+'_l');P['D_'+d.id+'_a']=+val('D_'+d.id+'_a');P['D_'+d.id+'_t']=val('D_'+d.id+'_t');P['D_'+d.id+'_f']=+val('D_'+d.id+'_f');});
   BUSH.concat(GASK).forEach(b=>P[b[0]]=+val(b[0]));
   TDSL.forEach(t=>{P['Tds_'+t.id+'_t']=val('Tds_'+t.id+'_t');P['Tds_'+t.id+'_f']=+val('Tds_'+t.id+'_f');P['Tds_'+t.id+'_l']=+val('Tds_'+t.id+'_l');P['Tds_'+t.id+'_a']=+val('Tds_'+t.id+'_a');});
+  BODIES.forEach(b=>{['X','Y','Z'].forEach(ax=>P[b.id+'_CM_'+ax]=+val(b.id+'_CM_'+ax));INM.forEach(nm=>P[b.id+'_I'+nm]=+val(b.id+'_I'+nm));});
 }
 
 function tiltPt(p){return p.clone().applyAxisAngle(new THREE.Vector3(1,0,0),-P.tilt*Math.PI/180);}
@@ -293,7 +310,30 @@ function buildMounts(){
     [top,base].forEach(pt=>{const sp=new THREE.Mesh(new THREE.SphereGeometry(7,10,10),tMat);sp.position.copy(pt);mountGroup.add(sp);});
   });
 }
-function rebuild(){readParams();buildTubDrum();buildSusp();buildMounts();}
+let showCM=false,showIn=false;
+function buildInertia(){
+  clearGroup(inertiaGroup);
+  if(!showCM&&!showIn)return;
+  const rx=P.Sys_CM_X,ry=P.Sys_CM_Y,rz=P.Sys_CM_Z;
+  const Iref=5441317;
+  BODIES.forEach(b=>{
+    const pos=new THREE.Vector3((P[b.id+'_CM_X']-rx)*0.7,(P[b.id+'_CM_Y']-ry)*0.7,(P[b.id+'_CM_Z']-rz)*0.7);
+    if(showIn){
+      const k=110/Iref;
+      const Ixx=P[b.id+'_Ixx'],Iyy=P[b.id+'_Iyy'],Izz=P[b.id+'_Izz'],Ixy=P[b.id+'_Ixy'],Iyz=P[b.id+'_Iyz'],Izx=P[b.id+'_Izx'];
+      const e=new THREE.Mesh(new THREE.SphereGeometry(1,22,16),new THREE.MeshStandardMaterial({color:b.color,transparent:true,opacity:0.32,roughness:0.5}));
+      e.matrixAutoUpdate=false;
+      e.matrix.set(Ixx*k,Ixy*k,Izx*k,pos.x, Ixy*k,Iyy*k,Iyz*k,pos.y, Izx*k,Iyz*k,Izz*k,pos.z, 0,0,0,1);
+      inertiaGroup.add(e);
+    }
+    if(showCM){
+      const m=new THREE.Mesh(new THREE.SphereGeometry(11,16,14),new THREE.MeshStandardMaterial({color:b.color,roughness:0.3,metalness:0.4}));
+      m.position.copy(pos);inertiaGroup.add(m);
+      const ax=new THREE.AxesHelper(34);ax.position.copy(pos);inertiaGroup.add(ax);
+    }
+  });
+}
+function rebuild(){readParams();buildTubDrum();buildSusp();buildMounts();buildInertia();}
 
 // 슬라이더 바인딩
 function bindCtrl(id,vid,unit,dec){
@@ -314,6 +354,9 @@ DAMPERS.forEach(d=>{
 });
 BUSH.concat(GASK).forEach(b=>bindCtrl(b[0],'v'+b[0],b[2],b[7]));
 TDSL.forEach(t=>{['f','l','a'].forEach((k,i)=>bindCtrl('Tds_'+t.id+'_'+k,'vTds_'+t.id+'_'+k,['N','mm','°'][i],i===2?1:0));document.getElementById('Tds_'+t.id+'_t').addEventListener('change',rebuild);});
+BODIES.forEach(b=>{['X','Y','Z'].forEach(ax=>bindCtrl(b.id+'_CM_'+ax,'v'+b.id+'_CM_'+ax,'mm',1));INM.forEach(nm=>bindCtrl(b.id+'_I'+nm,'v'+b.id+'_I'+nm,'kg·mm²',0));});
+document.getElementById('tgCM').addEventListener('click',e=>{showCM=!showCM;e.target.classList.toggle('on',showCM);rebuild();});
+document.getElementById('tgIn').addEventListener('click',e=>{showIn=!showIn;e.target.classList.toggle('on',showIn);rebuild();});
 
 // 아코디언
 document.querySelectorAll('[data-acc] .acc-h').forEach(h=>h.addEventListener('click',()=>h.parentElement.classList.toggle('open')));
