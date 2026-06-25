@@ -105,7 +105,7 @@ select{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:7px
     </div>
 
     <div class="acc" data-acc>
-      <div class="acc-h"><span class="dot d"></span>부싱<span class="cnt">6</span><span class="chev">▶</span></div>
+      <div class="acc-h"><span class="dot d"></span>댐퍼 부싱 (조인트)<span class="cnt">6</span><span class="chev">▶</span></div>
       <div class="acc-body" id="bushBody"></div>
     </div>
     <div class="acc" data-acc>
@@ -257,13 +257,17 @@ function buildSusp(){
 function buildMounts(){
   clearGroup(mountGroup);
   const tubR=tubGroup.userData.tubR||P.drumR+38,tubL=480;
-  // 부싱: 후면 마운트 박스, KX/KY/KZ -> 3축, C평균 -> 색
-  const bsx=10+(P.BuKX-10000)/140000*24,bsy=10+(P.BuKY-5000)/75000*24,bsz=10+(P.BuKZ-5000)/35000*24;
+  // 댐퍼 부싱: 댐퍼 4점 조인트(양 끝)에 강성 타원체, KX/KY/KZ -> 3축 반경, C평균 -> 색
+  const bex=0.55+(P.BuKX-10000)/140000*1.3,bey=0.55+(P.BuKY-5000)/75000*1.3,bez=0.55+(P.BuKZ-5000)/35000*1.3;
   const bc=(P.BuCX+P.BuCY+P.BuCZ)/3;
-  const buMat=new THREE.MeshStandardMaterial({color:new THREE.Color().setHSL(0.09,0.65,0.60-bc/1500*0.24),roughness:0.75});
-  const bu=new THREE.Mesh(new THREE.BoxGeometry(bsx*2,bsy*2,bsz*2),buMat);
-  bu.position.set(0,-tubR*0.45,-tubL/2-24);mountGroup.add(bu);
-  mountGroup.add(cylBetween(new THREE.Vector3(0,-tubR*0.45,-tubL/2),new THREE.Vector3(0,-tubR*0.45,-tubL/2-24+bsz),4,matDamperRod));
+  const buMat=new THREE.MeshStandardMaterial({color:new THREE.Color().setHSL(0.09,0.72,0.62-bc/1500*0.26),roughness:0.55,transparent:true,opacity:0.88});
+  DAMPERS.forEach(d=>{
+    const dl=P['D_'+d.id+'_l'],da=P['D_'+d.id+'_a'];
+    const top=new THREE.Vector3(d.sx*140,-(tubR-20),d.sz*150);
+    const th=(90-da)*Math.PI/180;
+    const base=new THREE.Vector3(top.x+d.sx*Math.sin(th)*dl,top.y-Math.cos(th)*dl,top.z);
+    [top,base].forEach(pt=>{const e=new THREE.Mesh(new THREE.SphereGeometry(13,16,12),buMat);e.scale.set(bex,bey,bez);e.position.copy(pt);mountGroup.add(e);});
+  });
   // 가스켓: 전면 링, K평균 -> 두께, C평균 -> 색
   const gk=(P.GkKx+P.GkKy+P.GkKz)/3,gc=(P.GkCx+P.GkCy+P.GkCz)/3;
   const gThk=5+(gk-1)/9*7;
