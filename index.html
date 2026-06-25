@@ -210,6 +210,7 @@ function readParams(){
   TDSL.forEach(t=>{P['Tds_'+t.id+'_t']=val('Tds_'+t.id+'_t');P['Tds_'+t.id+'_f']=+val('Tds_'+t.id+'_f');P['Tds_'+t.id+'_l']=+val('Tds_'+t.id+'_l');P['Tds_'+t.id+'_a']=+val('Tds_'+t.id+'_a');});
 }
 
+function tiltPt(p){return p.clone().applyAxisAngle(new THREE.Vector3(1,0,0),-P.tilt*Math.PI/180);}
 function buildTubDrum(){
   clearGroup(tubGroup);
   matDrum.color.setHSL(0.60,0.30,0.24-(P.drumMass-8)/12*0.10);
@@ -230,18 +231,20 @@ function buildSusp(){
   [['R',1,P.SpR_l,P.SpR_a,P.SpR_f],['L',-1,P.SpL_l,P.SpL_a,P.SpL_f]].forEach(arr=>{
     const sx=arr[1],len=arr[2],ang=arr[3],force=arr[4];
     const coils=Math.round(5+(force-5)/15*4),wireR=4.5+(force-5)/15*4;
-    const bot=new THREE.Vector3(sx*150,tubR-10,-70);
+    const bot0=new THREE.Vector3(sx*150,tubR-10,-70);
     const th=(90-ang)*Math.PI/180;
-    const top=new THREE.Vector3(bot.x+sx*Math.sin(th)*len,bot.y+Math.cos(th)*len,bot.z);
+    const top=new THREE.Vector3(bot0.x+sx*Math.sin(th)*len,bot0.y+Math.cos(th)*len,bot0.z);
+    const bot=tiltPt(bot0);
     suspGroup.add(springMesh(bot,top,coils,20,wireR));
     [bot,top].forEach(p=>{const s=new THREE.Mesh(new THREE.SphereGeometry(11,12,12),matSpring);s.position.copy(p);suspGroup.add(s);});
   });
   // 댐퍼 4개 개별 + 타입
   DAMPERS.forEach(d=>{
     const len=P['D_'+d.id+'_l'],ang=P['D_'+d.id+'_a'],type=P['D_'+d.id+'_t'];
-    const top=new THREE.Vector3(d.sx*140,-(tubR-20),d.sz*150);
+    const top0=new THREE.Vector3(d.sx*140,-(tubR-20),d.sz*150);
     const th=(90-ang)*Math.PI/180;
-    const base=new THREE.Vector3(top.x+d.sx*Math.sin(th)*len,top.y-Math.cos(th)*len,top.z);
+    const base=new THREE.Vector3(top0.x+d.sx*Math.sin(th)*len,top0.y-Math.cos(th)*len,top0.z);
+    const top=tiltPt(top0);
     const bodyR=7+(P['D_'+d.id+'_f']-20)/100*7;
     if(type==='2stg'){
       const mid=new THREE.Vector3().lerpVectors(base,top,0.6);
@@ -263,9 +266,10 @@ function buildMounts(){
   const buMat=new THREE.MeshStandardMaterial({color:new THREE.Color().setHSL(0.09,0.72,0.62-bc/1500*0.26),roughness:0.55,transparent:true,opacity:0.88});
   DAMPERS.forEach(d=>{
     const dl=P['D_'+d.id+'_l'],da=P['D_'+d.id+'_a'];
-    const top=new THREE.Vector3(d.sx*140,-(tubR-20),d.sz*150);
+    const top0=new THREE.Vector3(d.sx*140,-(tubR-20),d.sz*150);
     const th=(90-da)*Math.PI/180;
-    const base=new THREE.Vector3(top.x+d.sx*Math.sin(th)*dl,top.y-Math.cos(th)*dl,top.z);
+    const base=new THREE.Vector3(top0.x+d.sx*Math.sin(th)*dl,top0.y-Math.cos(th)*dl,top0.z);
+    const top=tiltPt(top0);
     [top,base].forEach(pt=>{const e=new THREE.Mesh(new THREE.SphereGeometry(13,16,12),buMat);e.scale.set(bex,bey,bez);e.position.copy(pt);mountGroup.add(e);});
   });
   // 가스켓: 전면 링, K평균 -> 두께, C평균 -> 색
