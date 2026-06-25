@@ -13,39 +13,46 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);overflow:hidden}
-.app{display:grid;grid-template-columns:312px 1fr;height:100vh}
+.app{display:grid;grid-template-columns:330px 1fr;height:100vh}
 
-/* ---- 좌측 패널 ---- */
 .panel{background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;display:flex;flex-direction:column}
 .panel::-webkit-scrollbar{width:7px}
 .panel::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:4px}
-.phead{padding:18px 20px 14px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel);z-index:2}
+.phead{padding:16px 18px 13px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel);z-index:3}
 .phead .ey{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--accent);text-transform:uppercase}
-.phead h1{font-size:16px;font-weight:800;margin-top:5px;letter-spacing:-.01em}
-.phead p{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.5}
+.phead h1{font-size:15.5px;font-weight:800;margin-top:5px;letter-spacing:-.01em}
+.phead p{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5}
 
-.grp{padding:14px 20px;border-bottom:1px solid var(--line)}
-.grp-t{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
-.grp-t .dot{width:9px;height:9px;border-radius:2px}
+/* 아코디언 */
+.acc{border-bottom:1px solid var(--line)}
+.acc-h{display:flex;align-items:center;gap:9px;padding:12px 18px;cursor:pointer;user-select:none;font-size:12px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--ink)}
+.acc-h:hover{background:#FAFBFD}
+.acc-h .dot{width:9px;height:9px;border-radius:2px;flex:0 0 auto}
 .dot.s{background:var(--spring)} .dot.d{background:var(--damper)} .dot.g{background:var(--tub)}
+.acc-h .cnt{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:var(--muted)}
+.acc-h .chev{transition:transform .2s;color:var(--muted);font-size:11px}
+.acc.open .acc-h .chev{transform:rotate(90deg)}
+.acc-body{display:none;padding:4px 18px 14px}
+.acc.open .acc-body{display:block}
 
-.ctrl{margin-bottom:14px}
-.ctrl:last-child{margin-bottom:2px}
-.ctrl-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
-.ctrl-h label{font-size:12.5px;font-weight:600;color:var(--ink)}
-.ctrl-h .val{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--accent)}
-.ctrl-h .val .u{color:var(--muted);font-weight:400;font-size:10px;margin-left:1px}
+.sub{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.5px;margin:12px 0 8px;display:flex;align-items:center;gap:6px}
+.sub::after{content:'';flex:1;height:1px;background:var(--line)}
+
+.ctrl{margin-bottom:11px}
+.ctrl-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
+.ctrl-h label{font-size:12px;font-weight:600;color:var(--ink)}
+.ctrl-h .val{font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:700;color:var(--accent)}
+.ctrl-h .val .u{color:var(--muted);font-weight:400;font-size:9.5px;margin-left:1px}
 input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:3px;background:var(--line);outline:none}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid #fff;box-shadow:0 1px 4px rgba(37,99,235,.4)}
-input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid #fff}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid #fff;box-shadow:0 1px 4px rgba(37,99,235,.4)}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid #fff}
+select{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:7px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--ink);background:#fff;cursor:pointer}
 
-.pfoot{margin-top:auto;padding:14px 20px;border-top:1px solid var(--line)}
-.btn{width:100%;padding:9px;border:1px solid var(--line);border-radius:9px;background:#fff;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s}
+.pfoot{position:sticky;bottom:0;background:var(--panel);padding:12px 18px;border-top:1px solid var(--line);display:flex;gap:8px}
+.btn{flex:1;padding:9px;border:1px solid var(--line);border-radius:9px;background:#fff;font-family:inherit;font-size:12px;font-weight:700;color:var(--ink);cursor:pointer;transition:all .15s}
 .btn:hover{border-color:var(--accent);color:var(--accent)}
 .btn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
-.btn+.btn{margin-top:8px}
 
-/* ---- 우측 3D ---- */
 .stage{position:relative;background:linear-gradient(160deg,#FBFCFE,#EEF3FA 60%,#E3EAF4)}
 #cv{display:block;width:100%;height:100%}
 .hint{position:absolute;left:16px;bottom:14px;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);background:rgba(255,255,255,.7);backdrop-filter:blur(4px);padding:6px 11px;border-radius:7px;border:1px solid var(--line);line-height:1.6}
@@ -58,49 +65,47 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bac
 </head>
 <body>
 <div class="app">
-  <!-- 설계변수 패널 -->
   <aside class="panel">
     <div class="phead">
       <div class="ey">VIBRATION · PARAMETRIC</div>
       <h1>세탁기 진동계 3D</h1>
-      <p>설계변수를 바꾸면 드럼·스프링·댐퍼 형상이 즉시 3D에 반영됩니다.</p>
+      <p>위치·치수·방향·타입 설계변수가 형상에 직접 반영됩니다.</p>
     </div>
 
-    <div class="grp">
-      <div class="grp-t"><span class="dot g"></span>드럼 · 터브</div>
-      <div class="ctrl"><div class="ctrl-h"><label>드럼 반경</label><span class="val" id="vDrumR">330<span class="u">mm</span></span></div>
-        <input type="range" id="DrumR" min="280" max="370" value="330" step="1"></div>
-      <div class="ctrl"><div class="ctrl-h"><label>틸팅 각도</label><span class="val" id="vTilt">10<span class="u">°</span></span></div>
-        <input type="range" id="Tilt" min="0" max="20" value="10" step="0.5"></div>
+    <!-- 드럼·터브 -->
+    <div class="acc open" data-acc>
+      <div class="acc-h"><span class="dot g"></span>드럼 · 터브<span class="cnt">2</span><span class="chev">▶</span></div>
+      <div class="acc-body">
+        <div class="ctrl"><div class="ctrl-h"><label>드럼 반경</label><span class="val" id="vDrumR">330<span class="u">mm</span></span></div><input type="range" id="DrumR" min="280" max="370" value="330" step="1"></div>
+        <div class="ctrl"><div class="ctrl-h"><label>틸팅 각도</label><span class="val" id="vTilt">10<span class="u">°</span></span></div><input type="range" id="Tilt" min="0" max="20" value="10" step="0.5"></div>
+      </div>
     </div>
 
-    <div class="grp">
-      <div class="grp-t"><span class="dot s"></span>서스펜션 스프링</div>
-      <div class="ctrl"><div class="ctrl-h"><label>강성 K</label><span class="val" id="vSk">11.7<span class="u">kgf/mm</span></span></div>
-        <input type="range" id="Sk" min="5" max="20" value="11.7" step="0.1"></div>
-      <div class="ctrl"><div class="ctrl-h"><label>설치 각도</label><span class="val" id="vSa">88<span class="u">°</span></span></div>
-        <input type="range" id="Sa" min="70" max="100" value="88" step="0.5"></div>
-      <div class="ctrl"><div class="ctrl-h"><label>설치 길이</label><span class="val" id="vSl">302<span class="u">mm</span></span></div>
-        <input type="range" id="Sl" min="250" max="350" value="302" step="1"></div>
+    <!-- 스프링 좌우 -->
+    <div class="acc open" data-acc>
+      <div class="acc-h"><span class="dot s"></span>서스펜션 스프링<span class="cnt">L/R</span><span class="chev">▶</span></div>
+      <div class="acc-body">
+        <div class="sub">우측 (Right)</div>
+        <div class="ctrl"><div class="ctrl-h"><label>설치 길이</label><span class="val" id="vSpR_l">302<span class="u">mm</span></span></div><input type="range" id="SpR_l" min="250" max="350" value="302" step="1"></div>
+        <div class="ctrl"><div class="ctrl-h"><label>설치 각도</label><span class="val" id="vSpR_a">88<span class="u">°</span></span></div><input type="range" id="SpR_a" min="70" max="100" value="88" step="0.5"></div>
+        <div class="sub">좌측 (Left)</div>
+        <div class="ctrl"><div class="ctrl-h"><label>설치 길이</label><span class="val" id="vSpL_l">302<span class="u">mm</span></span></div><input type="range" id="SpL_l" min="250" max="350" value="302" step="1"></div>
+        <div class="ctrl"><div class="ctrl-h"><label>설치 각도</label><span class="val" id="vSpL_a">88<span class="u">°</span></span></div><input type="range" id="SpL_a" min="70" max="100" value="88" step="0.5"></div>
+      </div>
     </div>
 
-    <div class="grp">
-      <div class="grp-t"><span class="dot d"></span>댐퍼</div>
-      <div class="ctrl"><div class="ctrl-h"><label>댐핑력</label><span class="val" id="vDf">65<span class="u">N</span></span></div>
-        <input type="range" id="Df" min="20" max="120" value="65" step="1"></div>
-      <div class="ctrl"><div class="ctrl-h"><label>설치 각도</label><span class="val" id="vDa">65<span class="u">°</span></span></div>
-        <input type="range" id="Da" min="45" max="90" value="65" step="0.5"></div>
-      <div class="ctrl"><div class="ctrl-h"><label>설치 길이</label><span class="val" id="vDl">210<span class="u">mm</span></span></div>
-        <input type="range" id="Dl" min="170" max="250" value="210" step="1"></div>
+    <!-- 댐퍼 4개 -->
+    <div class="acc" data-acc>
+      <div class="acc-h"><span class="dot d"></span>댐퍼 (4점)<span class="cnt">FR·FL·RR·RL</span><span class="chev">▶</span></div>
+      <div class="acc-body" id="damperBody"></div>
     </div>
 
     <div class="pfoot">
-      <button class="btn" id="btnVib">▶ 진동 시뮬</button>
-      <button class="btn" id="btnReset">↺ 시점 리셋</button>
+      <button class="btn" id="btnVib">▶ 진동</button>
+      <button class="btn" id="btnReset">↺ 시점</button>
     </div>
   </aside>
 
-  <!-- 3D 뷰 -->
   <main class="stage">
     <canvas id="cv"></canvas>
     <div class="tag">R290 HPWD · 진동계</div>
@@ -110,25 +115,20 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bac
       <div class="li"><span class="sw" style="background:#2563EB"></span>스프링</div>
       <div class="li"><span class="sw" style="background:#0D9488"></span>댐퍼</div>
     </div>
-    <div class="hint">드래그 <b>회전</b> · 휠 <b>줌</b> · 슬라이더로 <b>설계변수</b> 변경</div>
+    <div class="hint">드래그 <b>회전</b> · 휠 <b>줌</b> · 슬라이더로 <b>설계변수</b></div>
   </main>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-const cv=document.getElementById('cv');
-const stage=cv.parentElement;
+const cv=document.getElementById('cv'), stage=cv.parentElement;
 const scene=new THREE.Scene();
-scene.background=null;
-const camera=new THREE.PerspectiveCamera(42, 1, 1, 8000);
-const renderer=new THREE.WebGLRenderer({canvas:cv, antialias:true, alpha:true});
+const camera=new THREE.PerspectiveCamera(42,1,1,8000);
+const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-
-// 조명
 scene.add(new THREE.AmbientLight(0xffffff,0.72));
-const key=new THREE.DirectionalLight(0xffffff,0.85); key.position.set(600,900,700); scene.add(key);
-const fill=new THREE.DirectionalLight(0x9db4d6,0.35); fill.position.set(-500,200,-400); scene.add(fill);
+const key=new THREE.DirectionalLight(0xffffff,0.85);key.position.set(600,900,700);scene.add(key);
+const fill=new THREE.DirectionalLight(0x9db4d6,0.35);fill.position.set(-500,200,-400);scene.add(fill);
 
-// 머티리얼
 const matCab=new THREE.LineBasicMaterial({color:0xb6c2d4});
 const matTub=new THREE.MeshStandardMaterial({color:0x94a3b8,transparent:true,opacity:0.30,roughness:0.6,metalness:0.1,side:THREE.DoubleSide});
 const matDrum=new THREE.MeshStandardMaterial({color:0x1e293b,roughness:0.45,metalness:0.25});
@@ -137,168 +137,132 @@ const matSpring=new THREE.MeshStandardMaterial({color:0x2563eb,roughness:0.35,me
 const matDamperBody=new THREE.MeshStandardMaterial({color:0x0d9488,roughness:0.4,metalness:0.35});
 const matDamperRod=new THREE.MeshStandardMaterial({color:0xcbd5e1,roughness:0.3,metalness:0.6});
 
-// 씬 그룹
-const root=new THREE.Group(); scene.add(root);
-const tubGroup=new THREE.Group(); root.add(tubGroup);   // 터브+드럼 (진동)
-const suspGroup=new THREE.Group(); root.add(suspGroup); // 스프링+댐퍼
-
-// 캐비닛 치수 (mm)
+const root=new THREE.Group();scene.add(root);
+const tubGroup=new THREE.Group();root.add(tubGroup);
+const suspGroup=new THREE.Group();root.add(suspGroup);
 const CAB={w:700,h:850,d:700};
 
-function clearGroup(g){ while(g.children.length){const c=g.children.pop(); if(c.geometry)c.geometry.dispose(); g.remove(c);} }
+// 댐퍼 4점 정의 + 패널 동적 생성
+const DAMPERS=[{id:'FR',label:'전우',sx:1,sz:1},{id:'FL',label:'전좌',sx:-1,sz:1},{id:'RR',label:'후우',sx:1,sz:-1},{id:'RL',label:'후좌',sx:-1,sz:-1}];
+const damperBody=document.getElementById('damperBody');
+DAMPERS.forEach(d=>{
+  damperBody.insertAdjacentHTML('beforeend',
+    '<div class="sub">'+d.label+' ('+d.id+')</div>'+
+    '<div class="ctrl"><div class="ctrl-h"><label>설치 길이</label><span class="val" id="vD_'+d.id+'_l">210<span class="u">mm</span></span></div><input type="range" id="D_'+d.id+'_l" min="170" max="250" value="210" step="1"></div>'+
+    '<div class="ctrl"><div class="ctrl-h"><label>설치 각도</label><span class="val" id="vD_'+d.id+'_a">65<span class="u">°</span></span></div><input type="range" id="D_'+d.id+'_a" min="45" max="90" value="65" step="0.5"></div>'+
+    '<div class="ctrl"><div class="ctrl-h"><label>타입</label></div><select id="D_'+d.id+'_t"><option value="2stg">2단 (2stg)</option><option value="fric">마찰 (fric)</option></select></div>');
+});
 
-// 캐비닛 와이어프레임 (1회)
-function buildCabinet(){
-  const box=new THREE.BoxGeometry(CAB.w,CAB.h,CAB.d);
-  root.add(new THREE.LineSegments(new THREE.EdgesGeometry(box),matCab));
-}
-
-// 두 점 사이 실린더
+function clearGroup(g){while(g.children.length){const c=g.children.pop();if(c.geometry)c.geometry.dispose();g.remove(c);}}
+function buildCabinet(){root.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(CAB.w,CAB.h,CAB.d)),matCab));}
 function cylBetween(a,b,r,mat){
-  const dir=new THREE.Vector3().subVectors(b,a), len=dir.length()||1;
+  const dir=new THREE.Vector3().subVectors(b,a),len=dir.length()||1;
   const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,len,18),mat);
   m.position.copy(a).addScaledVector(dir,0.5);
   m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.clone().normalize());
   return m;
 }
-
-// 나선 스프링 곡선 → 튜브
 function springMesh(a,b,coils,coilR,wireR){
-  const axis=new THREE.Vector3().subVectors(b,a), len=axis.length()||1;
-  const up=axis.clone().normalize();
-  let perp=new THREE.Vector3(1,0,0); if(Math.abs(up.x)>0.85)perp.set(0,0,1);
-  const u=new THREE.Vector3().crossVectors(up,perp).normalize();
-  const v=new THREE.Vector3().crossVectors(up,u).normalize();
-  const seg=Math.max(40,Math.floor(coils*18)), pts=[];
-  for(let i=0;i<=seg;i++){
-    const t=i/seg, ang=t*coils*Math.PI*2;
-    pts.push(new THREE.Vector3().copy(a).addScaledVector(up,len*t)
-      .addScaledVector(u,Math.cos(ang)*coilR).addScaledVector(v,Math.sin(ang)*coilR));
-  }
-  const curve=new THREE.CatmullRomCurve3(pts);
-  return new THREE.Mesh(new THREE.TubeGeometry(curve,seg,wireR,8,false),matSpring);
+  const axis=new THREE.Vector3().subVectors(b,a),len=axis.length()||1,up=axis.clone().normalize();
+  let perp=new THREE.Vector3(1,0,0);if(Math.abs(up.x)>0.85)perp.set(0,0,1);
+  const u=new THREE.Vector3().crossVectors(up,perp).normalize(),v=new THREE.Vector3().crossVectors(up,u).normalize();
+  const seg=Math.max(40,Math.floor(coils*18)),pts=[];
+  for(let i=0;i<=seg;i++){const t=i/seg,ang=t*coils*Math.PI*2;
+    pts.push(new THREE.Vector3().copy(a).addScaledVector(up,len*t).addScaledVector(u,Math.cos(ang)*coilR).addScaledVector(v,Math.sin(ang)*coilR));}
+  return new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),seg,wireR,8,false),matSpring);
 }
 
-// 설계변수 읽기
+function val(id){return document.getElementById(id).value;}
 const P={};
 function readParams(){
-  P.drumR=+val('DrumR'); P.tilt=+val('Tilt');
-  P.Sk=+val('Sk'); P.Sa=+val('Sa'); P.Sl=+val('Sl');
-  P.Df=+val('Df'); P.Da=+val('Da'); P.Dl=+val('Dl');
+  P.drumR=+val('DrumR');P.tilt=+val('Tilt');
+  P.SpR_l=+val('SpR_l');P.SpR_a=+val('SpR_a');P.SpL_l=+val('SpL_l');P.SpL_a=+val('SpL_a');
+  DAMPERS.forEach(d=>{P['D_'+d.id+'_l']=+val('D_'+d.id+'_l');P['D_'+d.id+'_a']=+val('D_'+d.id+'_a');P['D_'+d.id+'_t']=val('D_'+d.id+'_t');});
 }
-function val(id){return document.getElementById(id).value;}
 
-// 터브 + 드럼 재빌드
 function buildTubDrum(){
   clearGroup(tubGroup);
-  const tubR=P.drumR+38, tubL=480;
-  // 터브 (반투명 외통)
-  const tub=new THREE.Mesh(new THREE.CylinderGeometry(tubR,tubR,tubL,40,1,true),matTub);
-  tub.rotation.x=Math.PI/2; tubGroup.add(tub);
-  // 드럼 (내통)
-  const drum=new THREE.Mesh(new THREE.CylinderGeometry(P.drumR,P.drumR,tubL-46,40,1,true),matDrum);
-  drum.rotation.x=Math.PI/2; tubGroup.add(drum);
-  tubGroup.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.CylinderGeometry(P.drumR,P.drumR,tubL-46,24,1,true)),matDrumLine).rotateX(Math.PI/2));
-  // 드럼 전면 림
-  const rim=new THREE.Mesh(new THREE.TorusGeometry(P.drumR,9,12,40),matDrum);
-  rim.position.z=(tubL-46)/2; tubGroup.add(rim);
-  // 틸팅 (앞이 들림 → X축 회전)
+  const tubR=P.drumR+38,tubL=480;
+  const tub=new THREE.Mesh(new THREE.CylinderGeometry(tubR,tubR,tubL,40,1,true),matTub);tub.rotation.x=Math.PI/2;tubGroup.add(tub);
+  const drum=new THREE.Mesh(new THREE.CylinderGeometry(P.drumR,P.drumR,tubL-46,40,1,true),matDrum);drum.rotation.x=Math.PI/2;tubGroup.add(drum);
+  const dl=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.CylinderGeometry(P.drumR,P.drumR,tubL-46,24,1,true)),matDrumLine);dl.rotation.x=Math.PI/2;tubGroup.add(dl);
+  const rim=new THREE.Mesh(new THREE.TorusGeometry(P.drumR,9,12,40),matDrum);rim.position.z=(tubL-46)/2;tubGroup.add(rim);
   tubGroup.rotation.x=-P.tilt*Math.PI/180;
   tubGroup.userData.tubR=tubR;
 }
 
-// 스프링 2 + 댐퍼 4 재빌드
 function buildSusp(){
   clearGroup(suspGroup);
   const tubR=tubGroup.userData.tubR||P.drumR+38;
-  // 스프링 코일/굵기: 강성 K 높을수록 굵고 촘촘
-  const coils=Math.round(5+(P.Sk-5)/15*4);       // 5~9
-  const wireR=4.5+(P.Sk-5)/15*4;                  // 4.5~8.5
-  const coilR=20;
-  // 상단 좌우 스프링: 터브 상단점 → 캐비닛 상단, Sa(수직대비)·Sl 반영
-  [-1,1].forEach(sx=>{
-    const bot=new THREE.Vector3(sx*150, tubR-10, -70);            // 터브 부착
-    const th=(90-P.Sa)*Math.PI/180;                              // 수직서 기운 각
-    const top=new THREE.Vector3(bot.x+sx*Math.sin(th)*P.Sl, bot.y+Math.cos(th)*P.Sl, bot.z);
-    suspGroup.add(springMesh(bot,top,coils,coilR,wireR));
-    // 마운트 점
+  // 스프링 좌우 개별
+  [['R',1,P.SpR_l,P.SpR_a],['L',-1,P.SpL_l,P.SpL_a]].forEach(arr=>{
+    const sx=arr[1],len=arr[2],ang=arr[3];
+    const bot=new THREE.Vector3(sx*150,tubR-10,-70);
+    const th=(90-ang)*Math.PI/180;
+    const top=new THREE.Vector3(bot.x+sx*Math.sin(th)*len,bot.y+Math.cos(th)*len,bot.z);
+    suspGroup.add(springMesh(bot,top,6,20,6));
     [bot,top].forEach(p=>{const s=new THREE.Mesh(new THREE.SphereGeometry(11,12,12),matSpring);s.position.copy(p);suspGroup.add(s);});
   });
-  // 하단 4 댐퍼: 터브 하단 → 캐비닛 하단, Da·Dl 반영. damping 굵기
-  const bodyR=7+(P.Df-20)/100*7;                  // 7~14
-  [[-1,1],[1,1],[-1,-1],[1,-1]].forEach(([sx,sz])=>{
-    const top=new THREE.Vector3(sx*140, -(tubR-20), sz*150);     // 터브 하단
-    const th=(90-P.Da)*Math.PI/180;
-    const base=new THREE.Vector3(top.x+sx*Math.sin(th)*P.Dl, top.y-Math.cos(th)*P.Dl, top.z);
-    // 바디(하부 2/3) + 로드(상부)
-    const mid=new THREE.Vector3().lerpVectors(base,top,0.6);
-    suspGroup.add(cylBetween(base,mid,bodyR,matDamperBody));
-    suspGroup.add(cylBetween(mid,top,bodyR*0.4,matDamperRod));
+  // 댐퍼 4개 개별 + 타입
+  DAMPERS.forEach(d=>{
+    const len=P['D_'+d.id+'_l'],ang=P['D_'+d.id+'_a'],type=P['D_'+d.id+'_t'];
+    const top=new THREE.Vector3(d.sx*140,-(tubR-20),d.sz*150);
+    const th=(90-ang)*Math.PI/180;
+    const base=new THREE.Vector3(top.x+d.sx*Math.sin(th)*len,top.y-Math.cos(th)*len,top.z);
+    if(type==='2stg'){
+      const mid=new THREE.Vector3().lerpVectors(base,top,0.6);
+      suspGroup.add(cylBetween(base,mid,9,matDamperBody));
+      suspGroup.add(cylBetween(mid,top,3.6,matDamperRod));
+    }else{
+      suspGroup.add(cylBetween(base,top,6.5,matDamperBody));
+    }
     [top,base].forEach(p=>{const s=new THREE.Mesh(new THREE.SphereGeometry(9,12,12),matDamperBody);s.position.copy(p);suspGroup.add(s);});
   });
 }
 
-function rebuild(){ readParams(); buildTubDrum(); buildSusp(); }
+function rebuild(){readParams();buildTubDrum();buildSusp();}
 
-// ---- 슬라이더 바인딩 ----
-const FMT={DrumR:['vDrumR','mm',0],Tilt:['vTilt','°',1],Sk:['vSk','kgf/mm',1],Sa:['vSa','°',1],Sl:['vSl','mm',0],Df:['vDf','N',0],Da:['vDa','°',1],Dl:['vDl','mm',0]};
-Object.keys(FMT).forEach(id=>{
-  const el=document.getElementById(id),[vid,unit,dec]=FMT[id];
-  const upd=()=>{document.getElementById(vid).innerHTML=(+el.value).toFixed(dec)+'<span class="u">'+unit+'</span>';};
-  el.addEventListener('input',()=>{upd();rebuild();});
-  upd();
+// 슬라이더 바인딩
+function bindCtrl(id,vid,unit,dec){
+  const el=document.getElementById(id);
+  const upd=()=>{const e=document.getElementById(vid);if(e)e.innerHTML=(+el.value).toFixed(dec)+'<span class="u">'+unit+'</span>';};
+  el.addEventListener('input',()=>{upd();rebuild();});upd();
+}
+bindCtrl('DrumR','vDrumR','mm',0);bindCtrl('Tilt','vTilt','°',1);
+bindCtrl('SpR_l','vSpR_l','mm',0);bindCtrl('SpR_a','vSpR_a','°',1);
+bindCtrl('SpL_l','vSpL_l','mm',0);bindCtrl('SpL_a','vSpL_a','°',1);
+DAMPERS.forEach(d=>{
+  bindCtrl('D_'+d.id+'_l','vD_'+d.id+'_l','mm',0);
+  bindCtrl('D_'+d.id+'_a','vD_'+d.id+'_a','°',1);
+  document.getElementById('D_'+d.id+'_t').addEventListener('change',rebuild);
 });
 
-// ---- 수동 궤도 컨트롤 ----
-let theta=0.7, phi=1.15, radius=1900, drag=false, px=0, py=0;
-function applyCam(){
-  camera.position.set(
-    radius*Math.sin(phi)*Math.sin(theta),
-    radius*Math.cos(phi),
-    radius*Math.sin(phi)*Math.cos(theta));
-  camera.lookAt(0,0,0);
-}
+// 아코디언
+document.querySelectorAll('[data-acc] .acc-h').forEach(h=>h.addEventListener('click',()=>h.parentElement.classList.toggle('open')));
+
+// 궤도 컨트롤
+let theta=0.7,phi=1.15,radius=1900,drag=false,px=0,py=0;
+function applyCam(){camera.position.set(radius*Math.sin(phi)*Math.sin(theta),radius*Math.cos(phi),radius*Math.sin(phi)*Math.cos(theta));camera.lookAt(0,0,0);}
 cv.addEventListener('pointerdown',e=>{drag=true;px=e.clientX;py=e.clientY;});
 addEventListener('pointerup',()=>drag=false);
-addEventListener('pointermove',e=>{
-  if(!drag)return;
-  theta-=(e.clientX-px)*0.008; phi-=(e.clientY-py)*0.008;
-  phi=Math.max(0.25,Math.min(Math.PI-0.25,phi));
-  px=e.clientX;py=e.clientY;
-});
+addEventListener('pointermove',e=>{if(!drag)return;theta-=(e.clientX-px)*0.008;phi-=(e.clientY-py)*0.008;phi=Math.max(0.25,Math.min(Math.PI-0.25,phi));px=e.clientX;py=e.clientY;});
 cv.addEventListener('wheel',e=>{e.preventDefault();radius=Math.max(900,Math.min(4200,radius+e.deltaY*1.1));},{passive:false});
 
-// ---- 진동 시뮬 ----
+// 진동
 let vibOn=false,t0=0;
-document.getElementById('btnVib').addEventListener('click',e=>{
-  vibOn=!vibOn; e.target.classList.toggle('on',vibOn);
-  e.target.textContent=vibOn?'■ 진동 정지':'▶ 진동 시뮬'; t0=performance.now();
-});
+document.getElementById('btnVib').addEventListener('click',e=>{vibOn=!vibOn;e.target.classList.toggle('on',vibOn);e.target.textContent=vibOn?'■ 정지':'▶ 진동';t0=performance.now();});
 document.getElementById('btnReset').addEventListener('click',()=>{theta=0.7;phi=1.15;radius=1900;});
 
-// ---- 리사이즈 ----
-function resize(){
-  const w=stage.clientWidth,h=stage.clientHeight;
-  renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix();
-}
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
 addEventListener('resize',resize);
 
-// ---- 렌더 루프 ----
 function tick(){
   requestAnimationFrame(tick);
-  if(vibOn){
-    // 강성↓ → 진폭↑, 댐핑↑ → 진폭↓. 정상상태 가진 진동(시각용)
-    const t=(performance.now()-t0)/1000;
-    const amp=Math.min(34, 220/P.Sk * (90/(P.Df+40)));
-    root.position.x=Math.sin(t*7.5)*amp;
-    root.position.y=Math.cos(t*7.5)*amp*0.65;
-  }else{ root.position.set(0,0,0); }
-  applyCam();
-  renderer.render(scene,camera);
+  if(vibOn){const t=(performance.now()-t0)/1000;root.position.x=Math.sin(t*7.5)*24;root.position.y=Math.cos(t*7.5)*15;}
+  else root.position.set(0,0,0);
+  applyCam();renderer.render(scene,camera);
 }
-
-// init
-buildCabinet(); rebuild(); resize(); applyCam(); tick();
+buildCabinet();rebuild();resize();applyCam();tick();
 </script>
 </body>
 </html>
