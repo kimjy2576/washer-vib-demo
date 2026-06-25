@@ -104,6 +104,19 @@ select{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:7px
       <div class="acc-body" id="damperBody"></div>
     </div>
 
+    <div class="acc" data-acc>
+      <div class="acc-h"><span class="dot d"></span>부싱<span class="cnt">6</span><span class="chev">▶</span></div>
+      <div class="acc-body" id="bushBody"></div>
+    </div>
+    <div class="acc" data-acc>
+      <div class="acc-h"><span class="dot d"></span>가스켓<span class="cnt">6</span><span class="chev">▶</span></div>
+      <div class="acc-body" id="gaskBody"></div>
+    </div>
+    <div class="acc" data-acc>
+      <div class="acc-h"><span class="dot s"></span>TDS 보조댐퍼<span class="cnt">L/R</span><span class="chev">▶</span></div>
+      <div class="acc-body" id="tdsBody"></div>
+    </div>
+
     <div class="pfoot">
       <button class="btn" id="btnVib">▶ 진동</button>
       <button class="btn" id="btnReset">↺ 시점</button>
@@ -144,6 +157,7 @@ const matDamperRod=new THREE.MeshStandardMaterial({color:0xcbd5e1,roughness:0.3,
 const root=new THREE.Group();scene.add(root);
 const tubGroup=new THREE.Group();root.add(tubGroup);
 const suspGroup=new THREE.Group();root.add(suspGroup);
+const mountGroup=new THREE.Group();root.add(mountGroup);
 const CAB={w:700,h:850,d:700};
 
 // 댐퍼 4점 정의 + 패널 동적 생성
@@ -157,6 +171,13 @@ DAMPERS.forEach(d=>{
     '<div class="ctrl"><div class="ctrl-h"><label>댐핑력</label><span class="val" id="vD_'+d.id+'_f">65<span class="u">N</span></span></div><input type="range" id="D_'+d.id+'_f" min="20" max="120" value="65" step="1"></div>'+
     '<div class="ctrl"><div class="ctrl-h"><label>타입</label></div><select id="D_'+d.id+'_t"><option value="2stg">2단 (2stg)</option><option value="fric">마찰 (fric)</option></select></div>');
 });
+function sl(id,label,unit,min,max,v,step,dec){return '<div class="ctrl"><div class="ctrl-h"><label>'+label+'</label><span class="val" id="v'+id+'">'+(+v).toFixed(dec)+'<span class="u">'+unit+'</span></span></div><input type="range" id="'+id+'" min="'+min+'" max="'+max+'" value="'+v+'" step="'+step+'"></div>';}
+const BUSH=[['BuKX','Kx','N/mm',10000,150000,95000,1000,0],['BuKY','Ky','N/mm',5000,80000,30000,1000,0],['BuKZ','Kz','N/mm',5000,40000,13000,1000,0],['BuCX','Cx','N·s/mm',100,1500,750,10,0],['BuCY','Cy','N·s/mm',100,1500,900,10,0],['BuCZ','Cz','N·s/mm',100,1500,500,10,0]];
+const GASK=[['GkKx','Kx','N/mm',1,10,4,0.1,1],['GkKy','Ky','N/mm',1,10,4,0.1,1],['GkKz','Kz','N/mm',1,10,4,0.1,1],['GkCx','Cx','N·s/mm',0.01,0.1,0.02,0.005,3],['GkCy','Cy','N·s/mm',0.01,0.1,0.02,0.005,3],['GkCz','Cz','N·s/mm',0.01,0.1,0.05,0.005,3]];
+const TDSL=[{id:'R',label:'우측 (Right)'},{id:'L',label:'좌측 (Left)'}];
+document.getElementById('bushBody').innerHTML=BUSH.map(b=>sl(b[0],b[1],b[2],b[3],b[4],b[5],b[6],b[7])).join('');
+document.getElementById('gaskBody').innerHTML=GASK.map(b=>sl(b[0],b[1],b[2],b[3],b[4],b[5],b[6],b[7])).join('');
+document.getElementById('tdsBody').innerHTML=TDSL.map(t=>'<div class="sub">'+t.label+'</div>'+'<div class="ctrl"><div class="ctrl-h"><label>타입</label></div><select id="Tds_'+t.id+'_t"><option value="none">없음</option><option value="fric">마찰</option><option value="2stg">2단</option></select></div>'+sl('Tds_'+t.id+'_f','댐핑력','N',0,100,0,1,0)+sl('Tds_'+t.id+'_l','설치 길이','mm',150,250,200,1,0)+sl('Tds_'+t.id+'_a','설치 각도','°',45,90,70,0.5,1)).join('');
 
 function clearGroup(g){while(g.children.length){const c=g.children.pop();if(c.geometry)c.geometry.dispose();g.remove(c);}}
 function buildCabinet(){root.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(CAB.w,CAB.h,CAB.d)),matCab));}
@@ -185,6 +206,8 @@ function readParams(){
   P.SpL_l=+val('SpL_l');P.SpL_a=+val('SpL_a');P.SpL_f=+val('SpL_f');
   P.drumMass=+val('DrumM');P.tubMass=+val('TubM');
   DAMPERS.forEach(d=>{P['D_'+d.id+'_l']=+val('D_'+d.id+'_l');P['D_'+d.id+'_a']=+val('D_'+d.id+'_a');P['D_'+d.id+'_t']=val('D_'+d.id+'_t');P['D_'+d.id+'_f']=+val('D_'+d.id+'_f');});
+  BUSH.concat(GASK).forEach(b=>P[b[0]]=+val(b[0]));
+  TDSL.forEach(t=>{P['Tds_'+t.id+'_t']=val('Tds_'+t.id+'_t');P['Tds_'+t.id+'_f']=+val('Tds_'+t.id+'_f');P['Tds_'+t.id+'_l']=+val('Tds_'+t.id+'_l');P['Tds_'+t.id+'_a']=+val('Tds_'+t.id+'_a');});
 }
 
 function buildTubDrum(){
@@ -231,7 +254,38 @@ function buildSusp(){
   });
 }
 
-function rebuild(){readParams();buildTubDrum();buildSusp();}
+function buildMounts(){
+  clearGroup(mountGroup);
+  const tubR=tubGroup.userData.tubR||P.drumR+38,tubL=480;
+  // 부싱: 후면 마운트 박스, KX/KY/KZ -> 3축, C평균 -> 색
+  const bsx=10+(P.BuKX-10000)/140000*24,bsy=10+(P.BuKY-5000)/75000*24,bsz=10+(P.BuKZ-5000)/35000*24;
+  const bc=(P.BuCX+P.BuCY+P.BuCZ)/3;
+  const buMat=new THREE.MeshStandardMaterial({color:new THREE.Color().setHSL(0.09,0.65,0.60-bc/1500*0.24),roughness:0.75});
+  const bu=new THREE.Mesh(new THREE.BoxGeometry(bsx*2,bsy*2,bsz*2),buMat);
+  bu.position.set(0,-tubR*0.45,-tubL/2-24);mountGroup.add(bu);
+  mountGroup.add(cylBetween(new THREE.Vector3(0,-tubR*0.45,-tubL/2),new THREE.Vector3(0,-tubR*0.45,-tubL/2-24+bsz),4,matDamperRod));
+  // 가스켓: 전면 링, K평균 -> 두께, C평균 -> 색
+  const gk=(P.GkKx+P.GkKy+P.GkKz)/3,gc=(P.GkCx+P.GkCy+P.GkCz)/3;
+  const gThk=5+(gk-1)/9*7;
+  const gkMat=new THREE.MeshStandardMaterial({color:new THREE.Color().setHSL(0.0,0.55,0.62-gc/0.1*0.18),roughness:0.55});
+  const gkM=new THREE.Mesh(new THREE.TorusGeometry(P.drumR+5,gThk,12,44),gkMat);
+  gkM.position.z=tubL/2-8;mountGroup.add(gkM);
+  // TDS 좌우 보조댐퍼 (type!=none), force -> 굵기
+  [['R',1],['L',-1]].forEach(a=>{
+    const id=a[0],sgn=a[1],type=P['Tds_'+id+'_t'];
+    if(type==='none')return;
+    const len=P['Tds_'+id+'_l'],ang=P['Tds_'+id+'_a'],force=P['Tds_'+id+'_f'];
+    const top=new THREE.Vector3(sgn*(tubR-6),-40,75);
+    const th=(90-ang)*Math.PI/180;
+    const base=new THREE.Vector3(top.x+sgn*Math.sin(th)*len,top.y-Math.cos(th)*len,top.z);
+    const r=5+force/100*6;
+    const tMat=new THREE.MeshStandardMaterial({color:0x7c3aed,roughness:0.4,metalness:0.3});
+    if(type==='2stg'){const mid=new THREE.Vector3().lerpVectors(base,top,0.6);mountGroup.add(cylBetween(base,mid,r,tMat));mountGroup.add(cylBetween(mid,top,r*0.45,matDamperRod));}
+    else{mountGroup.add(cylBetween(base,top,r*0.75,tMat));}
+    [top,base].forEach(pt=>{const sp=new THREE.Mesh(new THREE.SphereGeometry(7,10,10),tMat);sp.position.copy(pt);mountGroup.add(sp);});
+  });
+}
+function rebuild(){readParams();buildTubDrum();buildSusp();buildMounts();}
 
 // 슬라이더 바인딩
 function bindCtrl(id,vid,unit,dec){
@@ -250,6 +304,8 @@ DAMPERS.forEach(d=>{
   bindCtrl('D_'+d.id+'_f','vD_'+d.id+'_f','N',0);
   document.getElementById('D_'+d.id+'_t').addEventListener('change',rebuild);
 });
+BUSH.concat(GASK).forEach(b=>bindCtrl(b[0],'v'+b[0],b[2],b[7]));
+TDSL.forEach(t=>{['f','l','a'].forEach((k,i)=>bindCtrl('Tds_'+t.id+'_'+k,'vTds_'+t.id+'_'+k,['N','mm','°'][i],i===2?1:0));document.getElementById('Tds_'+t.id+'_t').addEventListener('change',rebuild);});
 
 // 아코디언
 document.querySelectorAll('[data-acc] .acc-h').forEach(h=>h.addEventListener('click',()=>h.parentElement.classList.toggle('open')));
