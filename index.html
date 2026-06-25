@@ -74,10 +74,12 @@ select{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:7px
 
     <!-- 드럼·터브 -->
     <div class="acc open" data-acc>
-      <div class="acc-h"><span class="dot g"></span>드럼 · 터브<span class="cnt">2</span><span class="chev">▶</span></div>
+      <div class="acc-h"><span class="dot g"></span>드럼 · 터브<span class="cnt">4</span><span class="chev">▶</span></div>
       <div class="acc-body">
         <div class="ctrl"><div class="ctrl-h"><label>드럼 반경</label><span class="val" id="vDrumR">330<span class="u">mm</span></span></div><input type="range" id="DrumR" min="280" max="370" value="330" step="1"></div>
         <div class="ctrl"><div class="ctrl-h"><label>틸팅 각도</label><span class="val" id="vTilt">10<span class="u">°</span></span></div><input type="range" id="Tilt" min="0" max="20" value="10" step="0.5"></div>
+        <div class="ctrl"><div class="ctrl-h"><label>드럼 질량</label><span class="val" id="vDrumM">14.0<span class="u">kg</span></span></div><input type="range" id="DrumM" min="8" max="20" value="14" step="0.1"></div>
+        <div class="ctrl"><div class="ctrl-h"><label>터브 질량</label><span class="val" id="vTubM">35.7<span class="u">kg</span></span></div><input type="range" id="TubM" min="20" max="50" value="35.7" step="0.1"></div>
       </div>
     </div>
 
@@ -88,9 +90,11 @@ select{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:7px
         <div class="sub">우측 (Right)</div>
         <div class="ctrl"><div class="ctrl-h"><label>설치 길이</label><span class="val" id="vSpR_l">302<span class="u">mm</span></span></div><input type="range" id="SpR_l" min="250" max="350" value="302" step="1"></div>
         <div class="ctrl"><div class="ctrl-h"><label>설치 각도</label><span class="val" id="vSpR_a">88<span class="u">°</span></span></div><input type="range" id="SpR_a" min="70" max="100" value="88" step="0.5"></div>
+        <div class="ctrl"><div class="ctrl-h"><label>강성 K</label><span class="val" id="vSpR_f">11.7<span class="u">kgf/mm</span></span></div><input type="range" id="SpR_f" min="5" max="20" value="11.7" step="0.1"></div>
         <div class="sub">좌측 (Left)</div>
         <div class="ctrl"><div class="ctrl-h"><label>설치 길이</label><span class="val" id="vSpL_l">302<span class="u">mm</span></span></div><input type="range" id="SpL_l" min="250" max="350" value="302" step="1"></div>
         <div class="ctrl"><div class="ctrl-h"><label>설치 각도</label><span class="val" id="vSpL_a">88<span class="u">°</span></span></div><input type="range" id="SpL_a" min="70" max="100" value="88" step="0.5"></div>
+        <div class="ctrl"><div class="ctrl-h"><label>강성 K</label><span class="val" id="vSpL_f">11.7<span class="u">kgf/mm</span></span></div><input type="range" id="SpL_f" min="5" max="20" value="11.7" step="0.1"></div>
       </div>
     </div>
 
@@ -150,6 +154,7 @@ DAMPERS.forEach(d=>{
     '<div class="sub">'+d.label+' ('+d.id+')</div>'+
     '<div class="ctrl"><div class="ctrl-h"><label>설치 길이</label><span class="val" id="vD_'+d.id+'_l">210<span class="u">mm</span></span></div><input type="range" id="D_'+d.id+'_l" min="170" max="250" value="210" step="1"></div>'+
     '<div class="ctrl"><div class="ctrl-h"><label>설치 각도</label><span class="val" id="vD_'+d.id+'_a">65<span class="u">°</span></span></div><input type="range" id="D_'+d.id+'_a" min="45" max="90" value="65" step="0.5"></div>'+
+    '<div class="ctrl"><div class="ctrl-h"><label>댐핑력</label><span class="val" id="vD_'+d.id+'_f">65<span class="u">N</span></span></div><input type="range" id="D_'+d.id+'_f" min="20" max="120" value="65" step="1"></div>'+
     '<div class="ctrl"><div class="ctrl-h"><label>타입</label></div><select id="D_'+d.id+'_t"><option value="2stg">2단 (2stg)</option><option value="fric">마찰 (fric)</option></select></div>');
 });
 
@@ -176,12 +181,16 @@ function val(id){return document.getElementById(id).value;}
 const P={};
 function readParams(){
   P.drumR=+val('DrumR');P.tilt=+val('Tilt');
-  P.SpR_l=+val('SpR_l');P.SpR_a=+val('SpR_a');P.SpL_l=+val('SpL_l');P.SpL_a=+val('SpL_a');
-  DAMPERS.forEach(d=>{P['D_'+d.id+'_l']=+val('D_'+d.id+'_l');P['D_'+d.id+'_a']=+val('D_'+d.id+'_a');P['D_'+d.id+'_t']=val('D_'+d.id+'_t');});
+  P.SpR_l=+val('SpR_l');P.SpR_a=+val('SpR_a');P.SpR_f=+val('SpR_f');
+  P.SpL_l=+val('SpL_l');P.SpL_a=+val('SpL_a');P.SpL_f=+val('SpL_f');
+  P.drumMass=+val('DrumM');P.tubMass=+val('TubM');
+  DAMPERS.forEach(d=>{P['D_'+d.id+'_l']=+val('D_'+d.id+'_l');P['D_'+d.id+'_a']=+val('D_'+d.id+'_a');P['D_'+d.id+'_t']=val('D_'+d.id+'_t');P['D_'+d.id+'_f']=+val('D_'+d.id+'_f');});
 }
 
 function buildTubDrum(){
   clearGroup(tubGroup);
+  matDrum.color.setHSL(0.60,0.30,0.24-(P.drumMass-8)/12*0.10);
+  matTub.opacity=0.20+(P.tubMass-20)/30*0.22;
   const tubR=P.drumR+38,tubL=480;
   const tub=new THREE.Mesh(new THREE.CylinderGeometry(tubR,tubR,tubL,40,1,true),matTub);tub.rotation.x=Math.PI/2;tubGroup.add(tub);
   const drum=new THREE.Mesh(new THREE.CylinderGeometry(P.drumR,P.drumR,tubL-46,40,1,true),matDrum);drum.rotation.x=Math.PI/2;tubGroup.add(drum);
@@ -195,12 +204,13 @@ function buildSusp(){
   clearGroup(suspGroup);
   const tubR=tubGroup.userData.tubR||P.drumR+38;
   // 스프링 좌우 개별
-  [['R',1,P.SpR_l,P.SpR_a],['L',-1,P.SpL_l,P.SpL_a]].forEach(arr=>{
-    const sx=arr[1],len=arr[2],ang=arr[3];
+  [['R',1,P.SpR_l,P.SpR_a,P.SpR_f],['L',-1,P.SpL_l,P.SpL_a,P.SpL_f]].forEach(arr=>{
+    const sx=arr[1],len=arr[2],ang=arr[3],force=arr[4];
+    const coils=Math.round(5+(force-5)/15*4),wireR=4.5+(force-5)/15*4;
     const bot=new THREE.Vector3(sx*150,tubR-10,-70);
     const th=(90-ang)*Math.PI/180;
     const top=new THREE.Vector3(bot.x+sx*Math.sin(th)*len,bot.y+Math.cos(th)*len,bot.z);
-    suspGroup.add(springMesh(bot,top,6,20,6));
+    suspGroup.add(springMesh(bot,top,coils,20,wireR));
     [bot,top].forEach(p=>{const s=new THREE.Mesh(new THREE.SphereGeometry(11,12,12),matSpring);s.position.copy(p);suspGroup.add(s);});
   });
   // 댐퍼 4개 개별 + 타입
@@ -209,12 +219,13 @@ function buildSusp(){
     const top=new THREE.Vector3(d.sx*140,-(tubR-20),d.sz*150);
     const th=(90-ang)*Math.PI/180;
     const base=new THREE.Vector3(top.x+d.sx*Math.sin(th)*len,top.y-Math.cos(th)*len,top.z);
+    const bodyR=7+(P['D_'+d.id+'_f']-20)/100*7;
     if(type==='2stg'){
       const mid=new THREE.Vector3().lerpVectors(base,top,0.6);
-      suspGroup.add(cylBetween(base,mid,9,matDamperBody));
-      suspGroup.add(cylBetween(mid,top,3.6,matDamperRod));
+      suspGroup.add(cylBetween(base,mid,bodyR,matDamperBody));
+      suspGroup.add(cylBetween(mid,top,bodyR*0.4,matDamperRod));
     }else{
-      suspGroup.add(cylBetween(base,top,6.5,matDamperBody));
+      suspGroup.add(cylBetween(base,top,bodyR*0.72,matDamperBody));
     }
     [top,base].forEach(p=>{const s=new THREE.Mesh(new THREE.SphereGeometry(9,12,12),matDamperBody);s.position.copy(p);suspGroup.add(s);});
   });
@@ -231,9 +242,12 @@ function bindCtrl(id,vid,unit,dec){
 bindCtrl('DrumR','vDrumR','mm',0);bindCtrl('Tilt','vTilt','°',1);
 bindCtrl('SpR_l','vSpR_l','mm',0);bindCtrl('SpR_a','vSpR_a','°',1);
 bindCtrl('SpL_l','vSpL_l','mm',0);bindCtrl('SpL_a','vSpL_a','°',1);
+bindCtrl('SpR_f','vSpR_f','kgf/mm',1);bindCtrl('SpL_f','vSpL_f','kgf/mm',1);
+bindCtrl('DrumM','vDrumM','kg',1);bindCtrl('TubM','vTubM','kg',1);
 DAMPERS.forEach(d=>{
   bindCtrl('D_'+d.id+'_l','vD_'+d.id+'_l','mm',0);
   bindCtrl('D_'+d.id+'_a','vD_'+d.id+'_a','°',1);
+  bindCtrl('D_'+d.id+'_f','vD_'+d.id+'_f','N',0);
   document.getElementById('D_'+d.id+'_t').addEventListener('change',rebuild);
 });
 
